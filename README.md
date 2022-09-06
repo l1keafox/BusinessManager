@@ -15,13 +15,15 @@
   6.  [License](#License)
   
   ## Usage 
-   Run 'node index.js' and answer the prompts given
+   Run node index.js and follow prompts to input or display tables and update employees
   
-  ![Website](/assets/images/readme.PNG)
+  ![Website](/readme.PNG)
   
   ## Installation 
    1. Download repo 
- 2. Run "node index.js"
+   2. mysql schema needs to be run in /db/schema.sql to create sql database.
+   3. npm i;
+   4. "node index.js"
   
   
   ## Contributing 
