@@ -19,6 +19,11 @@
   
   ![Website](/readme.PNG)
   
+
+  ## Video Link of useage
+
+<a href='https://drive.google.com/file/d/1mDPAEpW8hEBVY6i9qbwbFOZn0MkGepyh/view'> ![Website](/videoCap.PNG) </a>
+
   ## Installation 
    1. Download repo 
    2. mysql schema needs to be run in /db/schema.sql to create sql database.

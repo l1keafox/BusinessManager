@@ -1,6 +1,7 @@
-let inquire = require("inquirer");
+const inquire = require("inquirer");
 const mysql = require("mysql2/promise");
-let basicQuestions = [
+
+const basicQuestions = [
   {
     type: "list",
     name: "mainMenu",
@@ -333,6 +334,7 @@ async function calBudget(db) {
   let allEmploys = thisQuery[0];
 
   let totalBudget = 0;
+  console.log('----------------------------------------------------');
   for (let emp of allEmploys) {
     if (roleToCalc.includes(emp.role_id)) {
       console.log(
@@ -345,6 +347,7 @@ async function calBudget(db) {
       totalBudget += parseInt(roleObj[emp.role_id]);
     }
   }
+  console.log('----------------------------------------------------');
   console.log(
     "  Total budget:",
     totalBudget,
