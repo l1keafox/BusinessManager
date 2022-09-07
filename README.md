@@ -22,7 +22,7 @@
 
   ## Video Link of useage
 
-<a href='https://drive.google.com/file/d/1mDPAEpW8hEBVY6i9qbwbFOZn0MkGepyh/view'> ![Website](/videoCap.PNG) </a>
+<a href='https://drive.google.com/file/d/1-RPbMeceOWXGQYVihOfly7966ZLmmYye/view'> ![Website](/videoCap.PNG) </a>
 
   ## Installation 
    1. Download repo 
