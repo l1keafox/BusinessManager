@@ -18,9 +18,9 @@ let basicQuestions = [
       "add an employee",
       "update an employee role",
       "update employee manager",
-      "delete department",
-      "delete role",
       "delete employee",
+      "delete role",
+      "delete department",
       "exit",
     ],
   },
@@ -331,7 +331,7 @@ async function calBudget(db){
     console.log();
     for(let emp of allEmploys){
         if(emp.role_id === roleToCalc){
-            console.log(emp.first_name, emp.last_name ," Salary: ",roleObj[ emp.role_id ] ) l;
+            console.log(emp.first_name, emp.last_name ," Salary: ",roleObj[ emp.role_id ] ) ;
             totalBudget += parseInt( roleObj[ emp.role_id ] );
         }
         
@@ -481,7 +481,6 @@ async function updateEmployeesManager(db) {
       type: "list",
       name: "person",
       message: "Pick the person to update:",
-      //view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
       choices: nameArray,
     },
     {
@@ -493,16 +492,14 @@ async function updateEmployeesManager(db) {
 
   let answers4 = await inquire.prompt(q4);
   let employeeID;
-  for (let i in nameArray) {
-    if (nameArray[i].name === answers4.person) {
-      employeeID = nameArray[i].id;
+  for (let i in allEmploy) {
+    let fullName = allEmploy[i].first_name+ " "+allEmploy[i].last_name ;
+    if (fullName == answers4.person) {
+        employeeID = allEmploy[i].id;
       break;
     }
   }
-
-  await db.execute(
-    `UPDATE employee SET manager_id = "${answers4.new_id}" WHERE id = ${employeeID};`
-  );
+  await db.execute(`UPDATE employee SET manager_id = ${answers4.new_id} WHERE id = ${employeeID};`);
   doMainQuestion();
 }
 
