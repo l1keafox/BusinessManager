@@ -37,10 +37,7 @@ const login = {
 
 function doMainQuestion() {
   inquire.prompt(basicQuestions).then(async (answers) => {
-    const db = await mysql.createConnection(
-      login,
-      console.log(`Connected to the myBusiness_db database.`)
-    );
+    const db = await mysql.createConnection(login);
     let thisQuery;
     let thisQuestions;
     let allEmploy;
@@ -273,7 +270,6 @@ function doMainQuestion() {
 
       // View the total utilized budget of a department—in other words, the combined salaries of all employees in that department.
       case "view department budget":
-
         calBudget(db);
         break;
 
@@ -284,133 +280,151 @@ function doMainQuestion() {
   });
 }
 
-async function calBudget(db){
-    // lets create an object that holds id too salary 
-    let anQuery = await db.execute("SELECT * FROM role");
-    let allRoles = anQuery[0];
-    let roleObj = {};
-    for(let i in allRoles){
-        roleObj[allRoles[i].id] = allRoles[i].salary;
-    }
+async function calBudget(db) {
+  // lets create an object that holds id too salary
+  let anQuery = await db.execute("SELECT * FROM role");
+  let allRoles = anQuery[0];
+  let roleObj = {};
+  for (let i in allRoles) {
+    roleObj[allRoles[i].id] = allRoles[i].salary;
+  }
 
-    anQuery = await db.execute("SELECT * FROM department");
-    let allDep = anQuery[0];
-    let depName = [];
-    for(let i in allDep){
-        depName.push(allDep[i].name);
-    }
+  anQuery = await db.execute("SELECT * FROM department");
+  let allDep = anQuery[0];
+  let depName = [];
+  for (let i in allDep) {
+    depName.push(allDep[i].name);
+  }
 
-    let q = [
-        {
-            type: "list",
-            name: "dept",
-            message: "Please pick the department to calcuate:",
-            choices: depName
-        }
-    ];
-    
-    let theAnswer = await inquire.prompt(q);
-    let idAnswer;
-    for(let i in allDep){
-        if(allDep[i].name === theAnswer.dept){
-            idAnswer = allDep[i].id;
-            break;
-        }
-    }
-    let roleToCalc;
-    for(let i in allRoles){
-        if(allRoles[i].id === idAnswer){
-            roleToCalc = allRoles[i].id;
-            break;
-        }
-    }
-    let thisQuery = await db.execute("SELECT * FROM employee");
-    let allEmploys = thisQuery[0];
+  let q = [
+    {
+      type: "list",
+      name: "dept",
+      message: "Please pick the department to calcuate:",
+      choices: depName,
+    },
+  ];
 
-    let totalBudget = 0;
-    console.log();
-    for(let emp of allEmploys){
-        if(emp.role_id === roleToCalc){
-            console.log(emp.first_name, emp.last_name ," Salary: ",roleObj[ emp.role_id ] ) ;
-            totalBudget += parseInt( roleObj[ emp.role_id ] );
-        }
-        
+  let theAnswer = await inquire.prompt(q);
+  let idAnswer;
+  for (let i in allDep) {
+    if (allDep[i].name === theAnswer.dept) {
+      idAnswer = allDep[i].id;
+      break;
     }
-    console.log("Total Budgte:" , totalBudget, " Budget for Department: ", theAnswer.dept);
-    console.log();
-    doMainQuestion();
+  }
+  console.log(
+    "  Department Selected is:",
+    theAnswer.dept,
+    "ID of dept is:",
+    idAnswer
+  );
+
+  let roleToCalc = [];
+  for (let i in allRoles) {
+    if (allRoles[i].department_id === idAnswer) {
+      roleToCalc.push(allRoles[i].id);
+      break;
+    }
+  }
+  console.log("  RoleID in this department:", roleToCalc);
+
+  let thisQuery = await db.execute("SELECT * FROM employee");
+  let allEmploys = thisQuery[0];
+
+  let totalBudget = 0;
+  for (let emp of allEmploys) {
+    if (roleToCalc.includes(emp.role_id)) {
+      console.log(
+        " ",
+        emp.first_name,
+        emp.last_name,
+        " Salary: ",
+        roleObj[emp.role_id]
+      );
+      totalBudget += parseInt(roleObj[emp.role_id]);
+    }
+  }
+  console.log(
+    "  Total budget:",
+    totalBudget,
+    " Budget for Department: ",
+    theAnswer.dept
+  );
+  console.log();
+  doMainQuestion();
 }
 
-async function delRole(db){
-    let thisQuery = await db.execute("SELECT * FROM role");
-    let allRole = thisQuery[0];
-    let roleArray = [];
+async function delRole(db) {
+  let thisQuery = await db.execute("SELECT * FROM role");
+  let allRole = thisQuery[0];
+  let roleArray = [];
 
-    for (let i in allRole) {
-        roleArray.push(allRole[i].title);
-    }
-       
-    let q = [
-        {
-            type: "list",
-            name: "role",
-            message: "Please pick the role to delete:",
-            choices: roleArray
-        }
-    ];
-    console.log(roleArray);
-    let theAnswer = await inquire.prompt(q);
-    await db.execute(  `DELETE FROM role WHERE title='${theAnswer.role}';` );
-    doMainQuestion();
+  for (let i in allRole) {
+    roleArray.push(allRole[i].title);
+  }
+
+  let q = [
+    {
+      type: "list",
+      name: "role",
+      message: "Please pick the role to delete:",
+      choices: roleArray,
+    },
+  ];
+  console.log(roleArray);
+  let theAnswer = await inquire.prompt(q);
+  await db.execute(`DELETE FROM role WHERE title='${theAnswer.role}';`);
+  doMainQuestion();
 }
 
-async function delEmp(db){
-    let thisQuery = await db.execute("SELECT * FROM employee");
-    let allRole = thisQuery[0];
-    let roleArray = [];
+async function delEmp(db) {
+  let thisQuery = await db.execute("SELECT * FROM employee");
+  let allRole = thisQuery[0];
+  let roleArray = [];
 
-    for (let i in allRole) {
-        roleArray.push(allRole[i].first_name);
-    }
-       
-    let q = [
-        {
-            type: "list",
-            name: "employee",
-            message: "Please pick the role to delete:",
-            choices: roleArray,
-          }
-    ];
-    let vAnswer = await inquire.prompt(q);
-    await db.execute(  `DELETE FROM employee WHERE first_name='${vAnswer.employee}';` );
-    doMainQuestion();
+  for (let i in allRole) {
+    roleArray.push(allRole[i].first_name);
+  }
+
+  let q = [
+    {
+      type: "list",
+      name: "employee",
+      message: "Please pick the role to delete:",
+      choices: roleArray,
+    },
+  ];
+  let vAnswer = await inquire.prompt(q);
+  await db.execute(
+    `DELETE FROM employee WHERE first_name='${vAnswer.employee}';`
+  );
+  doMainQuestion();
 }
 
+async function delDept(db) {
+  let thisQuery = await db.execute("SELECT * FROM department");
+  let allDept = thisQuery[0];
+  let deptArray = [];
 
+  for (let i in allDept) {
+    deptArray.push(allDept[i].name);
+  }
 
-async function delDept(db){
-    let thisQuery = await db.execute("SELECT * FROM department");
-    let allDept = thisQuery[0];
-    let deptArray = [];
+  let q = [
+    {
+      type: "list",
+      name: "dept",
+      message: "Please pick the dept to delete:",
+      choices: deptArray,
+    },
+  ];
+  let vAnswer = await inquire.prompt(q);
 
-    for (let i in allDept) {
-      deptArray.push(allDept[i].name);
-    }
-       
-    let q = [
-        {
-            type: "list",
-            name: "dept",
-            message: "Please pick the dept to delete:",
-            choices: deptArray,
-          }
-    ];
-    let vAnswer = await inquire.prompt(q);
-
-    console.log(vAnswer.dept);
-    await db.execute(  `DELETE FROM department WHERE name='${vAnswer.dept}';` );
-    // DELETE FROM products WHERE product_id=1;
-    doMainQuestion();
+  console.log(vAnswer.dept);
+  await db.execute(`DELETE FROM department WHERE name='${vAnswer.dept}';`);
+  // DELETE FROM products WHERE product_id=1;
+  doMainQuestion();
 }
 
 async function showEmpByDept(db) {
@@ -493,13 +507,15 @@ async function updateEmployeesManager(db) {
   let answers4 = await inquire.prompt(q4);
   let employeeID;
   for (let i in allEmploy) {
-    let fullName = allEmploy[i].first_name+ " "+allEmploy[i].last_name ;
+    let fullName = allEmploy[i].first_name + " " + allEmploy[i].last_name;
     if (fullName == answers4.person) {
-        employeeID = allEmploy[i].id;
+      employeeID = allEmploy[i].id;
       break;
     }
   }
-  await db.execute(`UPDATE employee SET manager_id = ${answers4.new_id} WHERE id = ${employeeID};`);
+  await db.execute(
+    `UPDATE employee SET manager_id = ${answers4.new_id} WHERE id = ${employeeID};`
+  );
   doMainQuestion();
 }
 
