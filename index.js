@@ -122,48 +122,7 @@ function doMainQuestion() {
 
         break;
       case "update an employee role":
-        // WHEN I choose to update an employee role
-        // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
-        thisQuery = await db.execute("SELECT * FROM employee");
-        let allEmploy = thisQuery[0];
-        let nameArray = [];
-
-        for (let i in allEmploy) {
-          nameArray.push({
-            name: allEmploy[i].first_name + " " + allEmploy[i].last_name,
-            id: allEmploy[i].role_id,
-          });
-        }
-        // go through and get all employee names and ids;
-        let q4 = [
-          {
-            type: "list",
-            name: "person",
-            message: "Pick the person to update:",
-            //view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-            choices: nameArray,
-          },
-          {
-            type: "input",
-            name: "new_id",
-            message: "What is the new role id?",
-          },
-        ];
-
-        let answers4 = await inquire.prompt(q4);
-        let employeeID;
-        for (let i in nameArray) {
-          if (nameArray[i].name === answers4.person) {
-            employeeID = nameArray[i].id;
-            break;
-          }
-        }
-
-        await db.execute(
-          `UPDATE employee SET role_id = "${answers4.new_id}" WHERE id = ${employeeID};`
-        );
-
-        doMainQuestion();
+        updateEmployRole(db);
 
         break;
 
@@ -214,9 +173,9 @@ function doMainQuestion() {
         let employeesOfMan = [];
 
         let managerID;
-        for(let i in allEmp){
+        for (let i in allEmp) {
           let name = allEmp[i].first_name + " " + allEmp[i].last_name;
-          if(name === vAnswer.manager){
+          if (name === vAnswer.manager) {
             managerID = allEmp[i].id;
           }
         }
@@ -259,6 +218,68 @@ function doMainQuestion() {
     }
   });
 }
+async function updateEmployRole(db) {
+  // WHEN I choose to update an employee role
+  // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+  let thisQuery = await db.execute("SELECT * FROM employee");
+  let allEmploy = thisQuery[0];
+  let nameArray = [];
+
+  for (let i in allEmploy) {
+    nameArray.push({
+      name: allEmploy[i].first_name + " " + allEmploy[i].last_name,
+      id: allEmploy[i].role_id,
+    });
+  }
+
+  let whatQuery = await db.execute("SELECT * FROM role");
+  let allRoles = whatQuery[0];
+
+  let roleArray = [];
+
+  for (let i in allRoles) {
+    roleArray.push(allRoles[i].title);
+  }
+
+  // go through and get all employee names and ids;
+  let q4 = [
+    {
+      type: "list",
+      name: "person",
+      message: "Pick the person to update:",
+      //view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+      choices: nameArray,
+    },
+    {
+      type: "list",
+      name: "new_id",
+      message: "What is the new role?",
+      choices:roleArray
+    },
+  ];
+
+  let answers4 = await inquire.prompt(q4);
+  let employeeID;
+  for (let i in nameArray) {
+    if (nameArray[i].name === answers4.person) {
+      employeeID = nameArray[i].id;
+      break;
+    }
+  }
+
+  let roleID;
+  for (let i in allRoles) {
+    if (allRoles[i].title === answers4.new_id) {
+      roleID = allRoles[i].id;
+    }
+  }
+
+  await db.execute(
+    `UPDATE employee SET role_id = "${roleID}" WHERE id = ${employeeID};`
+  );
+
+  doMainQuestion();
+}
 
 async function addAnEmployee(db) {
   // WHEN I choose to add an employee
@@ -271,16 +292,15 @@ async function addAnEmployee(db) {
   let allRoles = alRoled[0];
 
   let namedRoles = [];
-  for(let e in allRoles){
-    namedRoles.push( allRoles[e].title);
+  for (let e in allRoles) {
+    namedRoles.push(allRoles[e].title);
   }
 
   let managerNames = [];
-  for(let e in newId3){
-    managerNames.push( newId3[e].first_name + " " + newId3[e].last_name);
+  for (let e in newId3) {
+    managerNames.push(newId3[e].first_name + " " + newId3[e].last_name);
   }
 
-  
   let q3 = [
     {
       type: "input",
@@ -311,20 +331,23 @@ async function addAnEmployee(db) {
     },
   ];
   let answers3 = await inquire.prompt(q3);
-  let newRoleID;// = answers3.role_id currenlty this is role name
-  for(let i in allRoles){
-    if(allRoles[i].title === answers3.role_id){
+  let newRoleID; // = answers3.role_id currenlty this is role name
+  for (let i in allRoles) {
+    if (allRoles[i].title === answers3.role_id) {
       newRoleID = allRoles[i].id;
     }
   }
 
-  let newManagerID;// = answers3.manager_id; // this is currently first+" "+lastname
-  for(let e in newId3){
-    if( newId3[e].first_name + " " + newId3[e].last_name === answers3.manager_id){
+  let newManagerID; // = answers3.manager_id; // this is currently first+" "+lastname
+  for (let e in newId3) {
+    if (
+      newId3[e].first_name + " " + newId3[e].last_name ===
+      answers3.manager_id
+    ) {
       newManagerID = newId3[e].id;
     }
   }
-  let newD = employeedd[0].length;  
+  let newD = employeedd[0].length;
   newD = newD * newD;
   await db.execute(
     `INSERT INTO employee (id, first_name,last_name,role_id,manager_id) VALUES ('${newD}','${answers3.first}','${answers3.last}','${newRoleID}' ,'${newManagerID}');`
@@ -553,23 +576,29 @@ async function updateEmployeesManager(db) {
       choices: nameArray,
     },
     {
-      type: "input",
+      type: "list",
       name: "new_id",
-      message: "What is the new manager id?",
+      choices: nameArray,
+      message: "What is the new manager?",
     },
   ];
 
   let answers4 = await inquire.prompt(q4);
   let employeeID;
+  let managerID;
   for (let i in allEmploy) {
     let fullName = allEmploy[i].first_name + " " + allEmploy[i].last_name;
     if (fullName == answers4.person) {
       employeeID = allEmploy[i].id;
-      break;
+    }
+    fullName = allEmploy[i].first_name + " " + allEmploy[i].last_name;
+    if (fullName == answers4.new_id) {
+      managerID = allEmploy[i].id;
     }
   }
+
   await db.execute(
-    `UPDATE employee SET manager_id = ${answers4.new_id} WHERE id = ${employeeID};`
+    `UPDATE employee SET manager_id = ${managerID} WHERE id = ${employeeID};`
   );
   doMainQuestion();
 }
