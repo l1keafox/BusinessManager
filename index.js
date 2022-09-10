@@ -228,10 +228,11 @@ async function updateEmployRole(db) {
   for (let i in allEmploy) {
     nameArray.push({
       name: allEmploy[i].first_name + " " + allEmploy[i].last_name,
-      id: allEmploy[i].role_id,
+      id: allEmploy[i].id,
     });
   }
 
+  console.log(nameArray);
   let whatQuery = await db.execute("SELECT * FROM role");
   let allRoles = whatQuery[0];
 
@@ -273,7 +274,7 @@ async function updateEmployRole(db) {
       roleID = allRoles[i].id;
     }
   }
-
+console.log( `UPDATE employee SET role_id = "${roleID}" WHERE id = ${employeeID};` );
   await db.execute(
     `UPDATE employee SET role_id = "${roleID}" WHERE id = ${employeeID};`
   );
@@ -407,6 +408,11 @@ async function calBudget(db) {
 
   let thisQuery = await db.execute("SELECT * FROM employee");
   let allEmploys = thisQuery[0];
+
+  // let roleObj = {};
+  // for (let i in allRoles) {
+  //   roleObj[allRoles[i].id] = allRoles[i].salary;
+  // }
 
   let totalBudget = 0;
   console.log("----------------------------------------------------");
