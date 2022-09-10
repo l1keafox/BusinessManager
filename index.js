@@ -263,6 +263,24 @@ function doMainQuestion() {
 async function addAnEmployee(db) {
   // WHEN I choose to add an employee
   // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+  // Let'
+  let employeedd = await db.execute("SELECT * FROM employee");
+  let newId3 = employeedd[0];
+
+  let alRoled = await db.execute("SELECT * FROM role");
+  let allRoles = alRoled[0];
+
+  let namedRoles = [];
+  for(let e in allRoles){
+    namedRoles.push( allRoles[e].title);
+  }
+
+  let managerNames = [];
+  for(let e in newId3){
+    managerNames.push( newId3[e].first_name + " " + newId3[e].last_name);
+  }
+
+  
   let q3 = [
     {
       type: "input",
@@ -274,23 +292,42 @@ async function addAnEmployee(db) {
       name: "last",
       message: "What is the last name?",
     },
+    // {
+    //   type: "input",
+    //   name: "role_id",
+    //   message: "What is the role id?",
+    // },
     {
-      type: "input",
+      type: "list",
       name: "role_id",
-      message: "What is the role id?",
+      message: "Please pick the role:",
+      choices: namedRoles,
     },
     {
-      type: "input",
+      type: "list",
       name: "manager_id",
-      message: "Who is Manager ID?",
+      message: "Please pick the Manager:",
+      choices: managerNames,
     },
   ];
   let answers3 = await inquire.prompt(q3);
-  let employeedd = await db.execute("SELECT * FROM employee");
-  let newId3 = employeedd[0].length;
-  newId3 = newId3 * newId3;
+  let newRoleID;// = answers3.role_id currenlty this is role name
+  for(let i in allRoles){
+    if(allRoles[i].title === answers3.role_id){
+      newRoleID = allRoles[i].id;
+    }
+  }
+
+  let newManagerID;// = answers3.manager_id; // this is currently first+" "+lastname
+  for(let e in newId3){
+    if( newId3[e].first_name + " " + newId3[e].last_name === answers3.manager_id){
+      newManagerID = newId3[e].id;
+    }
+  }
+  let newD = employeedd[0].length;  
+  newD = newD * newD;
   await db.execute(
-    `INSERT INTO employee (id, first_name,last_name,role_id,manager_id) VALUES ('${newId3}','${answers3.first}','${answers3.last}','${answers3.role_id}' ,'${answers3.manager_id}');`
+    `INSERT INTO employee (id, first_name,last_name,role_id,manager_id) VALUES ('${newD}','${answers3.first}','${answers3.last}','${newRoleID}' ,'${newManagerID}');`
   );
 
   doMainQuestion();
