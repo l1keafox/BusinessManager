@@ -118,39 +118,7 @@ function doMainQuestion() {
         doMainQuestion();
         break;
       case "add an employee":
-        // WHEN I choose to add an employee
-        // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-        let q3 = [
-          {
-            type: "input",
-            name: "first",
-            message: "What is the first name?",
-          },
-          {
-            type: "input",
-            name: "last",
-            message: "What is the last name?",
-          },
-          {
-            type: "input",
-            name: "role_id",
-            message: "What is the role id?",
-          },
-          {
-            type: "input",
-            name: "manager_id",
-            message: "Who is Manager ID?",
-          },
-        ];
-        let answers3 = await inquire.prompt(q3);
-        let employeedd = await db.execute("SELECT * FROM employee");
-        let newId3 = employeedd[0].length;
-        newId3 = newId3 * newId3;
-        await db.execute(
-          `INSERT INTO employee (id, first_name,last_name,role_id,manager_id) VALUES ('${newId3}','${answers3.first}','${answers3.last}','${answers3.role_id}' ,'${answers3.manager_id}');`
-        );
-
-        doMainQuestion();
+        addAnEmployee(db);
 
         break;
       case "update an employee role":
@@ -214,6 +182,7 @@ function doMainQuestion() {
         let managerArray = [];
 
         for (let i in allEmp) {
+          // go through all emploees and find the manager ids.
           managerArray.push(allEmp[i].manager_id);
         }
 
@@ -229,7 +198,7 @@ function doMainQuestion() {
           }
         }
 
-        console.log(namedArray); // unique is ['a', 1, 2, '1']
+        //        console.log(namedArray); // unique is ['a', 1, 2, '1']
 
         thisQuestions = [
           {
@@ -237,14 +206,24 @@ function doMainQuestion() {
             name: "manager",
             message: "Please pick the manager:",
             //view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-            choices: managerArray,
+            choices: namedArray,
           },
         ];
         let vAnswer = await inquire.prompt(thisQuestions);
-        console.log(vAnswer);
+        //        console.log(vAnswer);
         let employeesOfMan = [];
+
+        let managerID;
+        for(let i in allEmp){
+          let name = allEmp[i].first_name + " " + allEmp[i].last_name;
+          if(name === vAnswer.manager){
+            managerID = allEmp[i].id;
+          }
+        }
+        // = vAnswer.manager;
         for (let i in allEmp) {
-          if (allEmp[i].manager_id == vAnswer.manager) {
+          //let name = allEmp[i].first_name + " " + allEmp[i].last_name;
+          if (allEmp[i].manager_id == managerID) {
             employeesOfMan.push(allEmp[i]);
           }
         }
@@ -279,6 +258,42 @@ function doMainQuestion() {
         break;
     }
   });
+}
+
+async function addAnEmployee(db) {
+  // WHEN I choose to add an employee
+  // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+  let q3 = [
+    {
+      type: "input",
+      name: "first",
+      message: "What is the first name?",
+    },
+    {
+      type: "input",
+      name: "last",
+      message: "What is the last name?",
+    },
+    {
+      type: "input",
+      name: "role_id",
+      message: "What is the role id?",
+    },
+    {
+      type: "input",
+      name: "manager_id",
+      message: "Who is Manager ID?",
+    },
+  ];
+  let answers3 = await inquire.prompt(q3);
+  let employeedd = await db.execute("SELECT * FROM employee");
+  let newId3 = employeedd[0].length;
+  newId3 = newId3 * newId3;
+  await db.execute(
+    `INSERT INTO employee (id, first_name,last_name,role_id,manager_id) VALUES ('${newId3}','${answers3.first}','${answers3.last}','${answers3.role_id}' ,'${answers3.manager_id}');`
+  );
+
+  doMainQuestion();
 }
 
 async function calBudget(db) {
@@ -334,7 +349,7 @@ async function calBudget(db) {
   let allEmploys = thisQuery[0];
 
   let totalBudget = 0;
-  console.log('----------------------------------------------------');
+  console.log("----------------------------------------------------");
   for (let emp of allEmploys) {
     if (roleToCalc.includes(emp.role_id)) {
       console.log(
@@ -347,7 +362,7 @@ async function calBudget(db) {
       totalBudget += parseInt(roleObj[emp.role_id]);
     }
   }
-  console.log('----------------------------------------------------');
+  console.log("----------------------------------------------------");
   console.log(
     "  Total budget:",
     totalBudget,
@@ -424,7 +439,7 @@ async function delDept(db) {
   ];
   let vAnswer = await inquire.prompt(q);
 
-  console.log(vAnswer.dept);
+  //console.log(vAnswer.dept);
   await db.execute(`DELETE FROM department WHERE name='${vAnswer.dept}';`);
   // DELETE FROM products WHERE product_id=1;
   doMainQuestion();

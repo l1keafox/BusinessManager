@@ -17,12 +17,12 @@
   ## Usage 
    Run node index.js and follow prompts to input or display tables and update employees
   
-  ![Website](/readme.PNG)
+  ![Website](/assets/images/readme.PNG)
   
 
   ## Video Link of useage
 
-<a href='https://drive.google.com/file/d/1-RPbMeceOWXGQYVihOfly7966ZLmmYye/view'> ![Website](/videoCap.PNG) </a>
+<a href='https://drive.google.com/file/d/1-RPbMeceOWXGQYVihOfly7966ZLmmYye/view'> ![Website](/assets/images/videoCap.PNG) </a>
 
   ## Installation 
    1. Download repo 
