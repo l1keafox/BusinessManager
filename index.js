@@ -47,7 +47,7 @@ function doMainQuestion() {
       case "view all departments":
         // WHEN I choose to view all departments
         // THEN I am presented with a formatted table showing department names and department ids
-        let depts = await db.execute("SELECT * FROM department");
+        let depts = await db.execute("SELECT * FROM department ");
         console.table(depts[0]);
         doMainQuestion();
 
@@ -55,15 +55,16 @@ function doMainQuestion() {
       case "view all roles":
         // WHEN I choose to view all roles
         // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-        let roles = await db.execute("SELECT * FROM role");
+        let roles = await db.execute("SELECT * FROM role JOIN department ON role.department_id = department.id ");
         console.table(roles[0]);
         doMainQuestion();
 
         break;
       case "view all employees":
         // WHEN I choose to view all employees
+
         // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-        let employee = await db.execute(`SELECT * FROM employee JOIN role ON employee.role_id = role.id`);
+        let employee = await db.execute(`SELECT * FROM employee JOIN role ON employee.role_id = role.id `);
         console.table(employee[0]);
         doMainQuestion();
 
@@ -259,7 +260,13 @@ async function updateEmployRole(db) {
     },
   ];
 
+
+  
   let answers4 = await inquire.prompt(q4);
+
+
+
+
   let employeeID;
   for (let i in nameArray) {
     if (nameArray[i].name === answers4.person) {
@@ -313,11 +320,6 @@ async function addAnEmployee(db) {
       name: "last",
       message: "What is the last name?",
     },
-    // {
-    //   type: "input",
-    //   name: "role_id",
-    //   message: "What is the role id?",
-    // },
     {
       type: "list",
       name: "role_id",
