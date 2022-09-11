@@ -63,7 +63,7 @@ function doMainQuestion() {
       case "view all employees":
         // WHEN I choose to view all employees
         // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-        let employee = await db.execute("SELECT * FROM employee");
+        let employee = await db.execute(`SELECT * FROM employee JOIN role ON employee.role_id = role.id`);
         console.table(employee[0]);
         doMainQuestion();
 
