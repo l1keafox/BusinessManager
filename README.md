@@ -3,7 +3,7 @@
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-  Using command line inputs to view, create, add employees
+  Using command line inputs to view, create, add employees into an SQL server.
   
   
   ## Table of Contents 
